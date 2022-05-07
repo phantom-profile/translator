@@ -4,6 +4,9 @@ from sys import getsizeof
 from sys_exceptions import CustomException, custom_raise
 
 
+MY_OPERATIVE_MEMORY = 8 * 1024 * 1024 * 1024
+
+
 class Block:
     def __init__(self, start: int, size: int, is_used: bool):
         self.size: int = size
