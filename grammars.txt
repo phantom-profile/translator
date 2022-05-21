@@ -1,0 +1,15 @@
+<program> ::= <statement>
+<statement> ::= "if" <paren-expr> <statement> |
+                 "if" <paren-expr> <statement> "else" <statement> |
+                 "while" <paren-expr> <statement> |
+                 "{" { <statement> } "}" |
+                 <expr> ";" |
+                 ";"
+<paren-expr> ::= "(" <expr> ")"
+<expr> ::= <test> | <id> "=" <expr>
+<test> ::= <sum> | <sum> "<" <sum> | <sum> "~" <sum>
+<sum>  ::= <term> | <sum> "+" <term> | <sum> "-" <term> | <sum> "*" <term> | <sum> "/" <term>
+<term> ::= <id> | <int> | <paren-expr>
+<id>   ::= "a" | "b" | ... | "z"
+<int>  ::= <digit>, { <digit> }
+<digit> ::= "0" | "1" | ... | "9"
