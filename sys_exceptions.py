@@ -1,7 +1,7 @@
 class CustomException:
     RED_COLOR = '\033[1;31m'
 
-    def __init__(self, exit_code, message):
+    def __init__(self, message='Runtime Error', exit_code=1):
         self.message = message
         self.exit_code = exit_code
 

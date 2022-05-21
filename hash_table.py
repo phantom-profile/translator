@@ -22,9 +22,9 @@ class HashTable:
 
     def __init__(self, memory: MemoryAllocator, capacity: int = 8, load_factor_threshold: float = 0.6):
         if capacity < 1:
-            custom_raise(CustomException(message="Capacity must be a positive number", exit_code=1))
+            custom_raise(CustomException("Capacity must be a positive number"))
         if not (0 < load_factor_threshold <= 1):
-            custom_raise(CustomException(message="Load factor must be a number between (0, 1]", exit_code=1))
+            custom_raise(CustomException("Load factor must be a number between (0, 1]"))
         self._slots: list[Optional[Pair]] = capacity * [None]
         self.memory: MemoryAllocator = memory
         self._load_factor_threshold = load_factor_threshold
@@ -43,12 +43,12 @@ class HashTable:
     def get(self, key) -> Any:
         for _, pair in self._probe(key):
             if pair is None:
-                custom_raise(CustomException(message=f"No key {key} found", exit_code=1))
+                custom_raise(CustomException(f"No key {key} found"))
             if pair is self.DELETED:
                 continue
             if pair.key == key:
                 return pair.value
-        custom_raise(CustomException(message=f"No key {key} found", exit_code=1))
+        custom_raise(CustomException(f"No key {key} found"))
 
     def get_or_default(self, key, default=None) -> Optional[Any]:
         for _, pair in self._probe(key):
@@ -63,7 +63,7 @@ class HashTable:
     def del_pair(self, key) -> None:
         for index, pair in self._probe(key):
             if pair is None:
-                custom_raise(CustomException(message=f"No key {key} found", exit_code=1))
+                custom_raise(CustomException(f"No key {key} found"))
             if pair is self.DELETED:
                 continue
             if pair.key == key:
@@ -71,7 +71,7 @@ class HashTable:
                 self._slots[index] = self.DELETED
                 break
         else:
-            custom_raise(CustomException(message=f"No key {key} found", exit_code=1))
+            custom_raise(CustomException(f"No key {key} found"))
 
     @property
     def values(self):
@@ -128,7 +128,7 @@ class HashTable:
             index = (index + 1) % self.size
 
     def _resize_and_rehash(self):
-        copy = HashTable( self.memory, self.size * 2)
+        copy = HashTable(self.memory, self.size * 2)
         for key, value in self.pairs:
             copy.set_pair(key, value)
         for pair in self.pairs:

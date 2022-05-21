@@ -94,7 +94,7 @@ class MemoryAllocator:
 
     def _run_of_memory_alert(self, size) -> None:
         if size > self.memory_size:
-            custom_raise(CustomException(1, 'Run out of memory'))
+            custom_raise(CustomException('Run out of memory'))
 
     def _unused_blocks(self) -> List[Block]:
         return list(filter(lambda block: (not block.is_used), self.blocks))
