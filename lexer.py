@@ -38,8 +38,8 @@ class Lexer:
         'puts': PUTS
     }
 
-    def __init__(self, program_file: TextIO, logger_file: TextIO, hash: HashTable):
-        self.hash = hash
+    def __init__(self, program_file: TextIO, logger_file: TextIO, hash_table: HashTable):
+        self.hash_table = hash
         self.program_file = program_file
         self.logger_file = logger_file
         self.current_char = ''

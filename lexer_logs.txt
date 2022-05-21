@@ -1,0 +1,23 @@
+Tokens.LBRA
+Tokens.ID = 2268935739998947724
+Tokens.EQUAL
+Tokens.NUM = 2
+Tokens.ID = 3306344399204995944
+Tokens.MULT
+Tokens.NUM = 3
+Tokens.ID = 3306344399204995944
+Tokens.DIV
+Tokens.NUM = 5
+Tokens.IF
+Tokens.LPAR
+Tokens.ID = 5880992598405053594
+Tokens.NOEQUAL
+Tokens.NUM = 35
+Tokens.RPAR
+Tokens.LBRA
+Tokens.ID = -7565126253907602401
+Tokens.EQUAL
+Tokens.NUM = 51
+Tokens.RBRA
+Tokens.RBRA
+Tokens.EOF
