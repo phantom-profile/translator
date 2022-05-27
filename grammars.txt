@@ -2,10 +2,11 @@
 <statement> ::= "if" <paren-expr> <statement> |
                  "if" <paren-expr> <statement> "else" <statement> |
                  "while" <paren-expr> <statement> |
+                 "puts" <statement> |
                  "{" { <statement> } "}" |
                  <expr> ";" |
                  ";"
-<paren-expr> ::= "(" <expr> ")"
+<paren-expr> ::= "(" <expr> ";" ")"
 <expr> ::= <test> | <id> "=" <expr>
 <test> ::= <sum> | <sum> "<" <sum> | <sum> "~" <sum>
 <sum>  ::= <term> | <sum> "+" <term> | <sum> "-" <term> | <sum> "*" <term> | <sum> "/" <term>
