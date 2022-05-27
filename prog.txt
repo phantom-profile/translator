@@ -1,4 +1,21 @@
-{ bas = 2;
-w * 3;
-w / 5;
-if ( bsa ~ 35 ) { sas = 51 }; }
+{
+    a = 5 / 1;
+    b = 6 * 2;
+    if (a ~ 2;) {
+        a = a + 1;
+        b = b - 2;
+    }
+    while (a < 7;) {
+        a = a + 2;
+        a = a - 1;
+        if (b < 2;) {
+            a = a + 1;
+            b = b - 2;
+        } else {
+            c = 3;
+            v = 5;
+        }
+    }
+    puts a;
+    puts b;
+}
