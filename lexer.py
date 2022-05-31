@@ -38,7 +38,7 @@ class Lexer:
         'puts': PUTS
     }
 
-    def __init__(self, program_file: TextIO, logger_file: TextIO, hash_table: HashTable):
+    def __init__(self, program_file: TextIO, logger_file: TextIO):
         self.hash_table = hash
         self.program_file = program_file
         self.logger_file = logger_file
@@ -117,6 +117,6 @@ if __name__ == '__main__':
     read_from = open('prog.txt', 'r')
     log_to = open('lexer_logs.txt', 'w')
 
-    lexer = Lexer(read_from, log_to, HashTable(MemoryAllocator(MY_OPERATIVE_MEMORY)))
+    lexer = Lexer(read_from, log_to)
     while lexer.translated_token != Tokens.EOF:
         lexer.next_token()
