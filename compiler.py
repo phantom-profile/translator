@@ -1,11 +1,10 @@
-from typing import NamedTuple, Any, Optional
 from enum import Enum
+from pprint import pprint
 
-from stack_deck_queue import Stack
 from hash_table import HashTable
 from sys_exceptions import custom_raise, CustomException
 from memalloc import MemoryAllocator, MY_OPERATIVE_MEMORY
-from parser import ParserExpr, Node
+from parser import ParserExpr, Parser, Lexer
 
 # PUT x - положить переменную в хэш
 # GET x - get var from hash
@@ -50,46 +49,13 @@ class Compiler:
         elif node.kind == ParserExpr.STDOUT:
             self.compile(node.operands[0])
             self.gen(ParserExpr.STDOUT)
-        # elif node.kind == ParserExpr.LT:
-        #     self.compile(node.operands[0])
-        #     self.compile(node.operands[1])
-        #     self.gen(ParserExpr.LT)
         elif node.kind == ParserExpr.SET:
-            self.compile(node.operands[0])
+            self.compile(node.operands[1])
             self.gen(Commands.STORE)
-            self.gen(node.operands[1].value)
-        elif node.kind == ParserExpr.IF1:
-            self.compile(node.operands[0])
-            self.gen(Commands.JZ)
-            addr = self.pc
-            self.gen(0)
-            self.compile(node.operands[1])
-            self.program[addr] = self.pc
-        elif node.kind == ParserExpr.IF2:
-            self.compile(node.operands[0])
-            self.gen(Commands.JZ)
-            addr1 = self.pc
-            self.gen(0)
-            self.compile(node.operands[1])
-            self.gen(Commands.JMP)
-            addr2 = self.pc
-            self.gen(0)
-            self.program[addr1] = self.pc
-            self.compile(node.operands[2])
-            self.program[addr2] = self.pc
-        elif node.kind == ParserExpr.WHILE:
-            addr1 = self.pc
-            self.compile(node.operands[0])
-            self.gen(Commands.JZ)
-            addr2 = self.pc
-            self.gen(0)
-            self.compile(node.operands[1])
-            self.gen(Commands.JMP)
-            self.gen(addr1)
-            self.program[addr2] = self.pc
+            self.gen(node.operands[0].value)
         elif node.kind == ParserExpr.SEQ:
-            self.compile(node.operands[0])
-            self.compile(node.operands[1])
+            for each_node in node.operands:
+                self.compile(each_node)
         elif node.kind == ParserExpr.EXPR:
             self.compile(node.operands[0])
             self.gen(Commands.POP)
@@ -97,3 +63,13 @@ class Compiler:
             self.compile(node.operands[0])
             self.gen(Commands.HALT)
         return self.program
+
+
+if __name__ == '__main__':
+    read_from = open('prog.txt', 'r')
+    log_to = open('lexer_logs.txt', 'w')
+
+    lexer = Lexer(read_from, log_to)
+    compiler = Compiler()
+    parsed_program = Parser(lexer).parse()
+    pprint(compiler.compile(parsed_program))

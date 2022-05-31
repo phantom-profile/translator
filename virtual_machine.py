@@ -47,41 +47,22 @@ class VirtualMachine:
                 stack[-2] //= stack[-1]
                 stack.pop()
                 current_address += 1
-            elif instruction == ILT:
-                if stack[-2] < stack[-1]:
-                    stack[-2] = 1
-                else:
-                    stack[-2] = 0
-                stack.pop()
+            elif instruction == ParserExpr.STDOUT:
+                print(stack.pop())
                 current_address += 1
-            elif instruction == JZ:
-                if stack.pop() == 0:
-                    current_address = arg
-                else:
-                    current_address += 2
-            elif instruction == JNZ:
-                if stack.pop() != 0:
-                    current_address = arg
-                else:
-                    current_address += 2
-            elif instruction == JMP:
-                current_address = arg
-            elif instruction == HALT:
+            elif instruction == Commands.HALT:
                 break
 
-        print('Execution finished.')
-        print(self.local_variables)
+        print('Execution finished with exit code 0')
 
 
 if __name__ == '__main__':
-    pass
-    # l = Lexer()
-    # p = Parser(l)
-    #
-    # ast = p.parse()
-    #
-    # c = Compiler()
-    # program = c.compile(ast)
-    #
-    # vm = VirtualMachine()
-    # vm.run(program)
+    read_from = open('prog.txt', 'r')
+    log_to = open('lexer_logs.txt', 'w')
+
+    lexer = Lexer(read_from, log_to)
+    compiler = Compiler()
+    parsed_program = Parser(lexer).parse()
+
+    vm = VirtualMachine(MemoryAllocator(MY_OPERATIVE_MEMORY))
+    vm.run(compiler.compile(parsed_program))
