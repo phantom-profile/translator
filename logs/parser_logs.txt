@@ -1,0 +1,99 @@
+ParserExpr.MAIN, VALUE: None 
+	NODES:
+	ParserExpr.SEQ, VALUE: None 
+		NODES:
+		ParserExpr.EXPR, VALUE: None 
+			NODES:
+			ParserExpr.SET, VALUE: None 
+				NODES:
+				ParserExpr.VAR, VALUE: -2365798408045523117 
+				ParserExpr.CONST, VALUE: 20 
+		ParserExpr.EXPR, VALUE: None 
+			NODES:
+			ParserExpr.SET, VALUE: None 
+				NODES:
+				ParserExpr.VAR, VALUE: 3908185618966737156 
+				ParserExpr.CONST, VALUE: 12 
+		ParserExpr.EXPR, VALUE: None 
+			NODES:
+			ParserExpr.SET, VALUE: None 
+				NODES:
+				ParserExpr.VAR, VALUE: 3234347371544215519 
+				ParserExpr.CONST, VALUE: 0 
+		ParserExpr.EXPR, VALUE: None 
+			NODES:
+			ParserExpr.SET, VALUE: None 
+				NODES:
+				ParserExpr.VAR, VALUE: 4256955990372295081 
+				ParserExpr.MULT, VALUE: None 
+					NODES:
+					ParserExpr.MULT, VALUE: None 
+						NODES:
+						ParserExpr.CONST, VALUE: 12 
+						ParserExpr.CONST, VALUE: 60 
+					ParserExpr.CONST, VALUE: 60 
+		ParserExpr.EXPR, VALUE: None 
+			NODES:
+			ParserExpr.SET, VALUE: None 
+				NODES:
+				ParserExpr.VAR, VALUE: -6869594314445158167 
+				ParserExpr.CONST, VALUE: 2 
+		ParserExpr.EXPR, VALUE: None 
+			NODES:
+			ParserExpr.SET, VALUE: None 
+				NODES:
+				ParserExpr.VAR, VALUE: -5185406088148209586 
+				ParserExpr.MULT, VALUE: None 
+					NODES:
+					ParserExpr.MULT, VALUE: None 
+						NODES:
+						ParserExpr.VAR, VALUE: 3908185618966737156 
+						ParserExpr.CONST, VALUE: 60 
+					ParserExpr.CONST, VALUE: 60 
+		ParserExpr.EXPR, VALUE: None 
+			NODES:
+			ParserExpr.SET, VALUE: None 
+				NODES:
+				ParserExpr.VAR, VALUE: 1312621706739745576 
+				ParserExpr.MULT, VALUE: None 
+					NODES:
+					ParserExpr.VAR, VALUE: 3234347371544215519 
+					ParserExpr.CONST, VALUE: 60 
+		ParserExpr.EXPR, VALUE: None 
+			NODES:
+			ParserExpr.SET, VALUE: None 
+				NODES:
+				ParserExpr.VAR, VALUE: 2468555146954464846 
+				ParserExpr.ADD, VALUE: None 
+					NODES:
+					ParserExpr.ADD, VALUE: None 
+						NODES:
+						ParserExpr.VAR, VALUE: -2365798408045523117 
+						ParserExpr.VAR, VALUE: -5185406088148209586 
+					ParserExpr.VAR, VALUE: 1312621706739745576 
+		ParserExpr.STDOUT, VALUE: None 
+			NODES:
+			ParserExpr.EXPR, VALUE: None 
+				NODES:
+				ParserExpr.VAR, VALUE: 2468555146954464846 
+		ParserExpr.IF1, VALUE: None 
+			NODES:
+			ParserExpr.EXPR, VALUE: None 
+				NODES:
+				ParserExpr.LT, VALUE: None 
+					NODES:
+					ParserExpr.VAR, VALUE: 2468555146954464846 
+					ParserExpr.VAR, VALUE: 4256955990372295081 
+			ParserExpr.SEQ, VALUE: None 
+				NODES:
+				ParserExpr.EXPR, VALUE: None 
+					NODES:
+					ParserExpr.SET, VALUE: None 
+						NODES:
+						ParserExpr.VAR, VALUE: -6869594314445158167 
+						ParserExpr.CONST, VALUE: 1 
+		ParserExpr.STDOUT, VALUE: None 
+			NODES:
+			ParserExpr.EXPR, VALUE: None 
+				NODES:
+				ParserExpr.VAR, VALUE: -6869594314445158167 
