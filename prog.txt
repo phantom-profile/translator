@@ -1,9 +1,15 @@
 {
     seconds = 20;
-    hours = 2;
+    hours = 12;
     minutes = 0;
+    halfOfDayInSeconds = 12 * 60 * 60;
+    halfOfDay = 2;
     hoursToSeconds = hours * 60 * 60;
     minutesToSeconds = minutes * 60;
     totalSeconds = seconds + hoursToSeconds + minutesToSeconds;
     puts totalSeconds;
+    if (totalSeconds < halfOfDayInSeconds;) {
+        halfOfDay = 1;
+    }
+    puts halfOfDay;
 }

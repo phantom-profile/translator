@@ -1,16 +1,7 @@
 from enum import Enum
 from pprint import pprint
 
-from hash_table import HashTable
-from sys_exceptions import custom_raise, CustomException
-from memalloc import MemoryAllocator, MY_OPERATIVE_MEMORY
 from parser import ParserExpr, Parser, Lexer
-
-# PUT x - положить переменную в хэш
-# GET x - get var from hash
-# CALC a b - calculate a and b
-# OUT x - print x
-# FINISH - terminate program with code 0
 
 
 class Instructions(Enum):
@@ -22,18 +13,31 @@ class Instructions(Enum):
 
 
 class Commands(Enum):
-    FETCH, STORE, PUSH, POP, ADD, SUB, LT, JZ, JNZ, JMP, HALT = range(11)
+    FETCH, STORE, PUSH, POP, ADD, PLUS, DIV, MULT, SUB, LT, NOEQUAL, SAME_AS, JZ, JNZ, JMP, HALT = range(16)
 
 
 class Compiler:
+    CALCULATION_COMMANDS = {
+        ParserExpr.ADD: Commands.ADD,
+        ParserExpr.SUB: Commands.SUB,
+        ParserExpr.MULT: Commands.MULT,
+        ParserExpr.DIV: Commands.DIV
+    }
+
+    COMPARE_COMMANDS = {
+        ParserExpr.LT: Commands.LT,
+        ParserExpr.NOEQUAL: Commands.NOEQUAL,
+        ParserExpr.SAME_AS: Commands.SAME_AS
+    }
 
     def __init__(self):
+        self.logger_file = open('logs/compile_logs.txt', 'w')
         self.program = []
-        self.pc = 0
+        self.current_address = 0
 
     def gen(self, command):
         self.program.append(command)
-        self.pc = self.pc + 1
+        self.current_address += 1
 
     def compile(self, node):
         if node.kind == ParserExpr.VAR:
@@ -42,10 +46,10 @@ class Compiler:
         elif node.kind == ParserExpr.CONST:
             self.gen(Commands.PUSH)
             self.gen(node.value)
-        elif node.kind in (ParserExpr.ADD, ParserExpr.SUB, ParserExpr.DIV, ParserExpr.MULT):
+        elif node.kind in self.CALCULATION_COMMANDS:
             self.compile(node.operands[0])
             self.compile(node.operands[1])
-            self.gen(node.kind)
+            self.gen(self.CALCULATION_COMMANDS[node.kind])
         elif node.kind == ParserExpr.STDOUT:
             self.compile(node.operands[0])
             self.gen(ParserExpr.STDOUT)
@@ -53,6 +57,20 @@ class Compiler:
             self.compile(node.operands[1])
             self.gen(Commands.STORE)
             self.gen(node.operands[0].value)
+        elif node.kind in self.COMPARE_COMMANDS:
+            self.compile(node.operands[0])
+            self.compile(node.operands[1])
+            self.gen(self.COMPARE_COMMANDS[node.kind])
+        elif node.kind == ParserExpr.IF1:
+            self.compile(node.operands[0])
+            self.gen(Commands.JZ)
+            address_of_branch = self.current_address
+            # JZ переходит к этому адресу всегда
+            self.gen(0)
+            # собираем ветку
+            self.compile(node.operands[1])
+            # после того как будет известно, что за ветка скомпилирована, меняем адрес JZ на фактический
+            self.program[address_of_branch] = self.current_address
         elif node.kind == ParserExpr.SEQ:
             for each_node in node.operands:
                 self.compile(each_node)
@@ -62,14 +80,9 @@ class Compiler:
         elif node.kind == ParserExpr.MAIN:
             self.compile(node.operands[0])
             self.gen(Commands.HALT)
+            self.log()
         return self.program
 
-
-if __name__ == '__main__':
-    read_from = open('prog.txt', 'r')
-    log_to = open('lexer_logs.txt', 'w')
-
-    lexer = Lexer(read_from, log_to)
-    compiler = Compiler()
-    parsed_program = Parser(lexer).parse()
-    pprint(compiler.compile(parsed_program))
+    def log(self):
+        for command in self.program:
+            self.logger_file.write(str(command) + '\n')

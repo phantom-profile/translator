@@ -1,8 +1,6 @@
 from typing import TypeVar, Optional
 from enum import Enum
 
-from hash_table import HashTable
-from memalloc import MemoryAllocator, MY_OPERATIVE_MEMORY
 from lexer import Lexer
 from sys_exceptions import CustomException, custom_raise
 
@@ -11,7 +9,8 @@ SelfNode = TypeVar("SelfNode", bound="Node")
 
 
 class ParserExpr(Enum):
-    VAR, CONST, ADD, SUB, LT, SET, IF1, IF2, WHILE, EMPTY, SEQ, EXPR, MAIN, MULT, DIV, NE, STDOUT = range(17)
+    VAR, CONST, ADD, SUB, LT, SET, IF1, IF2, WHILE, EMPTY, SEQ, \
+      EXPR, MAIN, MULT, DIV, NOEQUAL, SAME_AS, STDOUT = range(18)
 
 
 class Node:
@@ -29,6 +28,7 @@ class Node:
 
 class Parser:
     def __init__(self, lexer: Lexer):
+        self.logger_file = open('logs/parser_logs.txt', 'w')
         self.lexer = lexer
 
     def parse(self) -> Node:
@@ -36,6 +36,7 @@ class Parser:
         node = Node(ParserExpr.MAIN, operands=[self.statement()])
         if self.lexer.translated_token != Lexer.EOF:
             custom_raise(CustomException("Invalid statement syntax"))
+        self.log(node)
         return node
 
     def statement(self) -> Node:
@@ -97,10 +98,11 @@ class Parser:
     def test(self):
         lexer_compare = {
             Lexer.LESS: ParserExpr.LT,
-            Lexer.NOEQUAL: ParserExpr.NE
+            Lexer.NOEQUAL: ParserExpr.NOEQUAL,
+            Lexer.SAME_AS: ParserExpr.SAME_AS
         }
         node = self.summa()
-        if self.lexer.translated_token in (Lexer.LESS, Lexer.NOEQUAL):
+        if self.lexer.translated_token in lexer_compare:
             kind = lexer_compare[self.lexer.translated_token]
             self.lexer.next_token()
             node = Node(kind, operands=[node, self.summa()])
@@ -132,11 +134,5 @@ class Parser:
         else:
             return self.paren_expr()
 
-
-if __name__ == '__main__':
-    read_from = open('prog.txt', 'r')
-    log_to = open('lexer_logs.txt', 'w')
-
-    lexer = Lexer(read_from, log_to, HashTable(MemoryAllocator(MY_OPERATIVE_MEMORY)))
-    p = Parser(lexer)
-    print(p.parse().draw_tree())
+    def log(self, node):
+        self.logger_file.write(node.draw_tree())

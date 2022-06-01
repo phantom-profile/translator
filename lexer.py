@@ -10,11 +10,13 @@ from sys_exceptions import CustomException, custom_raise
 
 
 class Tokens(Enum):
-    NUM, ID, IF, ELSE, WHILE, LBRA, RBRA, LPAR, RPAR, PLUS, MINUS, MULT, DIV, LESS, EQUAL, NOEQUAL, SEMICOLON, PUTS, EOF = range(19)
+    NUM, ID, IF, ELSE, WHILE, LBRA, RBRA, LPAR, RPAR, PLUS, MINUS, MULT, DIV, LESS, \
+      EQUAL, NOEQUAL, SEMICOLON, PUTS, SAME_AS, EOF = range(20)
 
 
 class Lexer:
-    NUM, ID, IF, ELSE, WHILE, LBRA, RBRA, LPAR, RPAR, PLUS, MINUS, MULT, DIV, LESS, EQUAL, NOEQUAL, SEMICOLON, PUTS, EOF = Tokens
+    NUM, ID, IF, ELSE, WHILE, LBRA, RBRA, LPAR, RPAR, PLUS, MINUS, MULT, DIV, LESS, \
+      EQUAL, NOEQUAL, SEMICOLON, PUTS, SAME_AS, EOF = Tokens
 
     LANGUAGE_SYMBOLS = {
         '{': LBRA,
@@ -28,7 +30,8 @@ class Lexer:
         '*': MULT,
         '/': DIV,
         '<': LESS,
-        '~': NOEQUAL
+        '~': NOEQUAL,
+        '^': SAME_AS,
     }
 
     RESERVED_WORDS = {
@@ -38,10 +41,10 @@ class Lexer:
         'puts': PUTS
     }
 
-    def __init__(self, program_file: TextIO, logger_file: TextIO):
+    def __init__(self, program_file: TextIO):
         self.hash_table = hash
         self.program_file = program_file
-        self.logger_file = logger_file
+        self.logger_file = open('logs/lexer_logs.txt', 'w')
         self.current_char = ''
         self.value = None
         self.translated_token = None
@@ -111,12 +114,3 @@ class Lexer:
 
     def __str__(self):
         return f'LAST TRANSLATED: {self.translated_token} NOW: {self.current_char if self.current_char else "EMPTY"}'
-
-
-if __name__ == '__main__':
-    read_from = open('prog.txt', 'r')
-    log_to = open('lexer_logs.txt', 'w')
-
-    lexer = Lexer(read_from, log_to)
-    while lexer.translated_token != Tokens.EOF:
-        lexer.next_token()

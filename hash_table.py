@@ -136,7 +136,7 @@ class HashTable:
         self._slots = copy._slots
 
 
-if __name__ == '__main__':
+def main():
     m = MemoryAllocator(MY_OPERATIVE_MEMORY)
     hash_table = HashTable(m)
     for i in range(20):
@@ -145,18 +145,6 @@ if __name__ == '__main__':
         print(f"{num_pairs:>2}/{hash_table.size:>2}", ("X" * num_pairs) + ("." * num_empty))
         hash_table.set_pair(i, i)
 
-    # empty hash depends on custom mem alloc
-    word_dictionary = HashTable(m)
-    print('empty hash', word_dictionary)
-    print('memory available', m.memory_size)
-    print('filling hash...')
-    word_dictionary.set_pair('ananas', 'morgenshtern')
-    word_dictionary.set_pair('petrushka', 'kak ukrop no ne sovsem')
-    word_dictionary.set_pair('banana', 'rastet na palme')
-    word_dictionary.set_pair('persik', 'vahhh kakoy')
-    print('memory available', m.memory_size)
-    print('filled hash', word_dictionary)
-    print('deleting banana')
-    word_dictionary.del_pair('banana')
-    print('bananaless hash', word_dictionary)
-    print('memory available', m.memory_size)
+
+if __name__ == '__main__':
+    main()
