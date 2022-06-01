@@ -1,7 +1,7 @@
 from typing import Any, Optional, NamedTuple, TypeVar
 
-from memalloc import MemoryAllocator, MY_OPERATIVE_MEMORY
-from sys_exceptions import CustomException, custom_raise
+from translator.memalloc import MemoryAllocator, MY_OPERATIVE_MEMORY
+from translator.sys_exceptions import CustomException, custom_raise
 
 
 SelfPair = TypeVar("SelfPair", bound="Pair")

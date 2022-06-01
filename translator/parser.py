@@ -1,8 +1,8 @@
 from typing import TypeVar, Optional
 from enum import Enum
 
-from lexer import Lexer
-from sys_exceptions import CustomException, custom_raise
+from translator.lexer import Lexer
+from translator.sys_exceptions import CustomException, custom_raise
 
 
 SelfNode = TypeVar("SelfNode", bound="Node")

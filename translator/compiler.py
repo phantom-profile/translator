@@ -1,7 +1,6 @@
 from enum import Enum
-from pprint import pprint
 
-from parser import ParserExpr, Parser, Lexer
+from translator.parser import ParserExpr
 
 
 class Instructions(Enum):

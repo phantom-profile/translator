@@ -1,12 +1,7 @@
-import sys
-
-from hash_table import HashTable
-from memalloc import MemoryAllocator, MY_OPERATIVE_MEMORY
-
 from typing import TextIO
 from enum import Enum
 
-from sys_exceptions import CustomException, custom_raise
+from translator.sys_exceptions import CustomException, custom_raise
 
 
 class Tokens(Enum):

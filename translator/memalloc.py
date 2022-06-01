@@ -1,7 +1,7 @@
 from typing import List, Any
 from sys import getsizeof
 
-from sys_exceptions import CustomException, custom_raise
+from translator.sys_exceptions import CustomException, custom_raise
 
 
 MY_OPERATIVE_MEMORY = 8 * 1024 * 1024 * 1024
