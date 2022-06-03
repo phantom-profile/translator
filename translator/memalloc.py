@@ -26,6 +26,7 @@ class Block:
 
 class MemoryAllocator:
     def __init__(self, memory_size: int):
+        self.logger_file = open('logs/memory_allocator_logs.txt', 'w')
         self.memory_size: int = memory_size
         self.blocks: List[Block] = []
 
@@ -33,6 +34,8 @@ class MemoryAllocator:
         size = getsizeof(any_object)
 
         self._run_of_memory_alert(size)
+
+        self._log(f'allocated {size} bytes\n')
 
         insertion_place = None
         for block in self._unused_blocks():
@@ -59,6 +62,8 @@ class MemoryAllocator:
 
     def free(self, any_object: Any) -> None:
         size = getsizeof(any_object)
+
+        self._log(f'freed {size} bytes\n')
 
         insertion_place = None
         for block in self._used_blocks():
@@ -101,6 +106,9 @@ class MemoryAllocator:
 
     def _used_blocks(self) -> List[Block]:
         return list(filter(lambda block: block.is_used, self.blocks))
+
+    def _log(self, log_message: str) -> None:
+        self.logger_file.write(log_message)
 
 
 # Press the green button in the gutter to run the script.

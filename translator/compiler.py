@@ -14,11 +14,13 @@ class Commands(Enum):
     SUB = 8          # SUB       - substitute two numbers on top of stack
     LT = 9           # LT        - compare two numbers on top of stack (a < b). Result - 0 или 1
     NON_EQUAL = 10   # NON_EQUAL - compare two numbers on top of stack (a != b). Result - 0 или 1
-    SAME_AS = 11     # SAME_AS   - compare two numbers on top of stack (a == b). Result - 0 или 1
+    EQUAL = 11       # EQUAL   - compare two numbers on top of stack (a == b). Result - 0 или 1
     JZ = 12          # JZ    A   - if 0 on top of stack - jump to A address.
     JNZ = 13         # JNZ   A   - if NOT 0 on top of stack - jump to A address.
     JMP = 14         # JMP   A   - jump to A address
     FINISH = 15      # FINISH    - terminate executing
+    INPUT = 16       # INPUT     - get object from standard input
+    OUTPUT = 17      # OUTPUT    - print object to standard output
 
 
 class Compiler:
@@ -32,7 +34,7 @@ class Compiler:
     COMPARE_COMMANDS = {
         ParserExpr.LT: Commands.LT,
         ParserExpr.NON_EQUAL: Commands.NON_EQUAL,
-        ParserExpr.EQUAL: Commands.SAME_AS
+        ParserExpr.EQUAL: Commands.EQUAL
     }
 
     def __init__(self):
@@ -40,11 +42,11 @@ class Compiler:
         self.program = []
         self.current_address = 0
 
-    def gen(self, command):
+    def gen(self, command) -> None:
         self.program.append(command)
         self.current_address += 1
 
-    def compile(self, node):
+    def compile(self, node) -> list[int, Commands]:
         if node.kind == ParserExpr.VAR:
             self.gen(Commands.FETCH)
             self.gen(node.value)
@@ -57,11 +59,11 @@ class Compiler:
             self.gen(self.CALCULATION_COMMANDS[node.kind])
         elif node.kind == ParserExpr.STDOUT:
             self.compile(node.operands[0])
-            self.gen(ParserExpr.STDOUT)
+            self.gen(Commands.OUTPUT)
         elif node.kind == ParserExpr.STDIN:
             self.gen(Commands.PUSH)
             self.gen(0)
-            self.gen(ParserExpr.STDIN)
+            self.gen(Commands.INPUT)
         elif node.kind == ParserExpr.SET:
             self.compile(node.operands[1])
             self.gen(Commands.STORE)
@@ -74,11 +76,8 @@ class Compiler:
             self.compile(node.operands[0])
             self.gen(Commands.JZ)
             address_of_branch = self.current_address
-            # JZ переходит к этому адресу всегда
             self.gen(0)
-            # собираем ветку
             self.compile(node.operands[1])
-            # после того как будет известно, что за ветка скомпилирована, меняем адрес JZ на фактический
             self.program[address_of_branch] = self.current_address
         elif node.kind == ParserExpr.IF2:
             self.compile(node.operands[0])

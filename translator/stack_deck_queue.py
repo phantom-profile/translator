@@ -1,28 +1,26 @@
 from translator.memalloc import MemoryAllocator
 from translator.sys_exceptions import CustomException, custom_raise
 
-SYSTEM_MEMORY = 1024
-
 
 class Collection:
     def __init__(self, memory: MemoryAllocator):
         self._elements = []
         self.memory: MemoryAllocator = memory
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self._elements)
 
-    def _out_of_elements_alert(self):
+    def _out_of_elements_alert(self) -> None:
         if not self._elements:
             custom_raise(CustomException(1, 'Collection out of elements'))
 
     def __getitem__(self, index):
         return self._elements[index]
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: int, value):
         self._elements[key] = value
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._elements)
 
 

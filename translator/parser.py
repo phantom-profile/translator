@@ -19,7 +19,7 @@ class Node:
         self.value = value
         self.operands: list[SelfNode] = list(operands)
 
-    def draw_tree(self, depth=1):
+    def draw_tree(self, depth=1) -> str:
         nodes = '\t' * depth + 'NODES:\n' if self.operands else ''
         for node in self.operands:
             nodes += '\t' * depth + f'{(node.draw_tree(depth + 1))}'
@@ -33,32 +33,34 @@ class Parser:
 
     def parse(self) -> Node:
         self.lexer.next_token()
-        node = Node(ParserExpr.MAIN, operands=[self.statement()])
+        node = Node(ParserExpr.MAIN, operands=[self._statement()])
         if self.lexer.translated_token != Lexer.EOF:
             custom_raise(CustomException("Invalid statement syntax"))
-        self.log(node)
+        self._log(node)
         return node
 
-    def statement(self) -> Node:
+    # PRIVATE
+
+    def _statement(self) -> Node:
         if self.lexer.translated_token == Lexer.IF:
             node = Node(ParserExpr.IF1)
             self.lexer.next_token()
             node.operands = [
-                self.paren_expr(),
-                self.statement()
+                self._paren_expr(),
+                self._statement()
             ]
             if self.lexer.translated_token == Lexer.ELSE:
                 node.kind = ParserExpr.IF2
                 self.lexer.next_token()
-                node.operands.append(self.statement())
+                node.operands.append(self._statement())
         elif self.lexer.translated_token == Lexer.WHILE:
             node = Node(ParserExpr.WHILE)
             self.lexer.next_token()
-            node.operands = [self.paren_expr(), self.statement()]
+            node.operands = [self._paren_expr(), self._statement()]
         elif self.lexer.translated_token == Lexer.PUTS:
             node = Node(ParserExpr.STDOUT)
             self.lexer.next_token()
-            node.operands = [self.statement()]
+            node.operands = [self._statement()]
         elif self.lexer.translated_token == Lexer.SEMICOLON:
             node = Node(ParserExpr.EMPTY)
             self.lexer.next_token()
@@ -67,7 +69,7 @@ class Parser:
             self.lexer.next_token()
             while self.lexer.translated_token != Lexer.RBRA:
                 node.kind = ParserExpr.SEQ
-                node.operands.append(self.statement())
+                node.operands.append(self._statement())
             self.lexer.next_token()
         else:
             node = Node(ParserExpr.EXPR, operands=[self.expr()])
@@ -76,53 +78,53 @@ class Parser:
             self.lexer.next_token()
         return node
 
-    def paren_expr(self) -> Node:
+    def _paren_expr(self) -> Node:
         if self.lexer.translated_token != Lexer.LPAR:
             custom_raise(CustomException('"(" expected'))
         self.lexer.next_token()
-        node = self.statement()
+        node = self._statement()
         if self.lexer.translated_token != Lexer.RPAR:
             custom_raise(CustomException('"(" expected'))
         self.lexer.next_token()
         return node
 
-    def expr(self):
+    def expr(self) -> Node:
         if self.lexer.translated_token != Lexer.ID:
-            return self.test()
-        node = self.test()
+            return self._test()
+        node = self._test()
         if node.kind == ParserExpr.VAR and self.lexer.translated_token == Lexer.SET:
             self.lexer.next_token()
             node = Node(ParserExpr.SET, operands=[node, self.expr()])
         return node
 
-    def test(self):
+    def _test(self) -> Node:
         lexer_compare = {
             Lexer.LESS: ParserExpr.LT,
             Lexer.NON_EQUAL: ParserExpr.NON_EQUAL,
             Lexer.EQUAL: ParserExpr.EQUAL
         }
-        node = self.summa()
+        node = self._summa()
         if self.lexer.translated_token in lexer_compare:
             kind = lexer_compare[self.lexer.translated_token]
             self.lexer.next_token()
-            node = Node(kind, operands=[node, self.summa()])
+            node = Node(kind, operands=[node, self._summa()])
         return node
 
-    def summa(self):
+    def _summa(self) -> Node:
         lexer_math = {
             Lexer.PLUS: ParserExpr.ADD,
             Lexer.MINUS: ParserExpr.SUB,
             Lexer.MULT: ParserExpr.MULT,
             Lexer.DIV: ParserExpr.DIV,
         }
-        node = self.term()
+        node = self._term()
         while self.lexer.translated_token in lexer_math:
             kind = lexer_math[self.lexer.translated_token]
             self.lexer.next_token()
-            node = Node(kind, operands=[node, self.term()])
+            node = Node(kind, operands=[node, self._term()])
         return node
 
-    def term(self):
+    def _term(self) -> Node:
         if self.lexer.translated_token == Lexer.ID:
             node = Node(ParserExpr.VAR, self.lexer.value)
             self.lexer.next_token()
@@ -136,7 +138,7 @@ class Parser:
             self.lexer.next_token()
             return node
         else:
-            return self.paren_expr()
+            return self._paren_expr()
 
-    def log(self, node):
+    def _log(self, node) -> None:
         self.logger_file.write(node.draw_tree())

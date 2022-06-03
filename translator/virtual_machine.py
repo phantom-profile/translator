@@ -1,5 +1,4 @@
 from translator.compiler import Commands
-from translator.parser import ParserExpr
 from translator.hash_table import HashTable
 from translator.memalloc import MemoryAllocator
 from translator.stack_deck_queue import Stack
@@ -11,7 +10,7 @@ class VirtualMachine:
         self.local_variables: HashTable = HashTable(memory_allocator)
         self.stack = Stack(memory_allocator)
 
-    def run(self, program: list):
+    def run(self, program: list) -> None:
         current_address = 0
         while True:
             instruction = program[current_address]
@@ -56,7 +55,7 @@ class VirtualMachine:
                 self.stack[-2] = 1 if self.stack[-2] != self.stack[-1] else 0
                 self.stack.pop()
                 current_address += 1
-            elif instruction == Commands.SAME_AS:
+            elif instruction == Commands.EQUAL:
                 self.stack[-2] = 1 if self.stack[-2] == self.stack[-1] else 0
                 self.stack.pop()
                 current_address += 1
@@ -66,7 +65,7 @@ class VirtualMachine:
                 current_address = arg if self.stack.pop() != 0 else current_address + 2
             elif instruction == Commands.JMP:
                 current_address = arg
-            elif instruction == ParserExpr.STDIN:
+            elif instruction == Commands.INPUT:
                 value = input().strip()
                 try:
                     value = int(value)
@@ -77,7 +76,7 @@ class VirtualMachine:
                         value = str(value)
                 self.stack[-1] = value
                 current_address += 1
-            elif instruction == ParserExpr.STDOUT:
+            elif instruction == Commands.OUTPUT:
                 print(self.stack.pop())
                 current_address += 1
             elif instruction == Commands.FINISH:
