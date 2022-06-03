@@ -1,15 +1,13 @@
 {
-    seconds = 20;
-    hours = 12;
-    minutes = 0;
-    halfOfDayInSeconds = 12 * 60 * 60;
-    halfOfDay = 2;
-    hoursToSeconds = hours * 60 * 60;
-    minutesToSeconds = minutes * 60;
-    totalSeconds = seconds + hoursToSeconds + minutesToSeconds;
-    puts totalSeconds;
-    if (totalSeconds < halfOfDayInSeconds;) {
-        halfOfDay = 1;
-    }
-    puts halfOfDay;
+    PI = 3.14;
+    circle_radius = 5;
+    circle_square = PI * circle_radius * circle_radius;
+    circle_perimeter = 2 * PI * circle_radius;
+
+    puts "circle radius:";
+    puts circle_radius;
+    puts "circle square:";
+    puts circle_square;
+    puts "circle perimeter:";
+    puts circle_perimeter;
 }
