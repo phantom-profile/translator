@@ -7,12 +7,12 @@ from translator.sys_exceptions import CustomException, custom_raise
 
 class Tokens(Enum):
     NUM, ID, IF, ELSE, WHILE, LBRA, RBRA, LPAR, RPAR, PLUS, MINUS, MULT, DIV, LESS, \
-      SET, NON_EQUAL, SEMICOLON, PUTS, EQUAL, QUOTE, STRING, EOF = range(22)
+      SET, NON_EQUAL, SEMICOLON, PUTS, EQUAL, QUOTE, STRING, GETS, EOF = range(23)
 
 
 class Lexer:
     NUM, ID, IF, ELSE, WHILE, LBRA, RBRA, LPAR, RPAR, PLUS, MINUS, MULT, DIV, LESS, \
-      SET, NON_EQUAL, SEMICOLON, PUTS, EQUAL, QUOTE, STRING, EOF = Tokens
+      SET, NON_EQUAL, SEMICOLON, PUTS, EQUAL, QUOTE, STRING, GETS, EOF = Tokens
 
     LANGUAGE_SYMBOLS = {
         '{': LBRA,
@@ -35,7 +35,8 @@ class Lexer:
         'if': IF,
         'else': ELSE,
         'while': WHILE,
-        'puts': PUTS
+        'puts': PUTS,
+        'gets': GETS,
     }
 
     def __init__(self, program_file: TextIO):

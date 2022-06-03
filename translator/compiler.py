@@ -58,6 +58,10 @@ class Compiler:
         elif node.kind == ParserExpr.STDOUT:
             self.compile(node.operands[0])
             self.gen(ParserExpr.STDOUT)
+        elif node.kind == ParserExpr.STDIN:
+            self.gen(Commands.PUSH)
+            self.gen(0)
+            self.gen(ParserExpr.STDIN)
         elif node.kind == ParserExpr.SET:
             self.compile(node.operands[1])
             self.gen(Commands.STORE)

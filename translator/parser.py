@@ -10,7 +10,7 @@ SelfNode = TypeVar("SelfNode", bound="Node")
 
 class ParserExpr(Enum):
     VAR, CONST, ADD, SUB, LT, SET, IF1, IF2, WHILE, EMPTY, SEQ, \
-      EXPR, MAIN, MULT, DIV, NON_EQUAL, EQUAL, STDOUT = range(18)
+      EXPR, MAIN, MULT, DIV, NON_EQUAL, EQUAL, STDOUT, STDIN = range(19)
 
 
 class Node:
@@ -125,6 +125,10 @@ class Parser:
     def term(self):
         if self.lexer.translated_token == Lexer.ID:
             node = Node(ParserExpr.VAR, self.lexer.value)
+            self.lexer.next_token()
+            return node
+        elif self.lexer.translated_token == Lexer.GETS:
+            node = Node(ParserExpr.STDIN, self.lexer.value)
             self.lexer.next_token()
             return node
         elif self.lexer.translated_token in (Lexer.NUM, Lexer.STRING):

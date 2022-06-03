@@ -10,7 +10,10 @@
 <expr> ::= <test> | <id> "=" <expr>
 <test> ::= <sum> | <sum> "<" <sum> | <sum> "~" <sum> | <sum> ^ <sum>
 <sum>  ::= <term> | <sum> "+" <term> | <sum> "-" <term> | <sum> "*" <term> | <sum> "/" <term>
-<term> ::= <id> | <int> | <paren-expr>
-<id>   ::= "a" | "b" | ... | "z"
+<term> ::= <id> | <int> | <paren-expr> | "gets"
+<id>   ::= <letter>*
+<string> ::= '"' <letter>* '"'
+<float> ::= <int> "." <int>
 <int>  ::= <digit>, { <digit> }
 <digit> ::= "0" | "1" | ... | "9"
+<letter> ::= "a" | ... | "z" | "A"| ... | "Z" | "_"

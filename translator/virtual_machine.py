@@ -66,6 +66,17 @@ class VirtualMachine:
                 current_address = arg if self.stack.pop() != 0 else current_address + 2
             elif instruction == Commands.JMP:
                 current_address = arg
+            elif instruction == ParserExpr.STDIN:
+                value = input().strip()
+                try:
+                    value = int(value)
+                except ValueError:
+                    try:
+                        value = float(value)
+                    except ValueError:
+                        value = str(value)
+                self.stack[-1] = value
+                current_address += 1
             elif instruction == ParserExpr.STDOUT:
                 print(self.stack.pop())
                 current_address += 1
