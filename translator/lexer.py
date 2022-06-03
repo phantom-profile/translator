@@ -1,3 +1,4 @@
+from string import ascii_letters, digits
 from typing import TextIO
 from enum import Enum
 
@@ -6,17 +7,17 @@ from translator.sys_exceptions import CustomException, custom_raise
 
 class Tokens(Enum):
     NUM, ID, IF, ELSE, WHILE, LBRA, RBRA, LPAR, RPAR, PLUS, MINUS, MULT, DIV, LESS, \
-      EQUAL, NOEQUAL, SEMICOLON, PUTS, SAME_AS, EOF = range(20)
+      SET, NON_EQUAL, SEMICOLON, PUTS, EQUAL, QUOTE, STRING, EOF = range(22)
 
 
 class Lexer:
     NUM, ID, IF, ELSE, WHILE, LBRA, RBRA, LPAR, RPAR, PLUS, MINUS, MULT, DIV, LESS, \
-      EQUAL, NOEQUAL, SEMICOLON, PUTS, SAME_AS, EOF = Tokens
+      SET, NON_EQUAL, SEMICOLON, PUTS, EQUAL, QUOTE, STRING, EOF = Tokens
 
     LANGUAGE_SYMBOLS = {
         '{': LBRA,
         '}': RBRA,
-        '=': EQUAL,
+        '=': SET,
         ';': SEMICOLON,
         '(': LPAR,
         ')': RPAR,
@@ -25,8 +26,9 @@ class Lexer:
         '*': MULT,
         '/': DIV,
         '<': LESS,
-        '~': NOEQUAL,
-        '^': SAME_AS,
+        '~': NON_EQUAL,
+        '^': EQUAL,
+        '"': QUOTE,
     }
 
     RESERVED_WORDS = {
@@ -61,28 +63,42 @@ class Lexer:
             elif self.current_char.isdigit():
                 self.tokenize_number()
             elif self.current_char.isalpha():
-                self.tokenize_string()
+                self.tokenize_ids_and_reserved_words()
             elif self.translated_token != self.EOF:
                 custom_raise(CustomException(f'Unexpected symbol: {self.current_char}'))
             self.log_token()
 
     def tokenize_special_symbol(self):
         self.greedy_perform = False
+        if self.current_char == '"':
+            return self.tokenize_string()
         self.translated_token = self.LANGUAGE_SYMBOLS[self.current_char]
 
-    def tokenize_number(self):
-        int_value = 0
-        while self.current_char.isdigit():
-            int_value = int_value * 10 + int(self.current_char)
+    def tokenize_string(self):
+        string_const = ''
+        self.get_char()
+        while self.current_char != '"':
+            string_const += self.current_char
             self.get_char()
             self.greedy_perform = True
-        self.value = int_value
+        self.get_char()
+        self.translated_token = self.STRING
+        self.value = string_const
+
+    def tokenize_number(self):
+        value = ''
+        while self.current_char in digits + '.':
+            value += self.current_char
+            self.get_char()
+            self.greedy_perform = True
+        float_value = float(value)
+        self.value = int(float_value) if int(float_value) == float_value else float_value
         self.translated_token = self.NUM
 
-    def tokenize_string(self):
+    def tokenize_ids_and_reserved_words(self):
         ident = ''
-        while self.current_char.isalpha():
-            ident = ident + self.current_char.lower()
+        while self.current_char in ascii_letters + '_':
+            ident += self.current_char.lower()
             self.get_char()
             self.greedy_perform = True
         if ident in self.RESERVED_WORDS:

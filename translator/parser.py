@@ -10,7 +10,7 @@ SelfNode = TypeVar("SelfNode", bound="Node")
 
 class ParserExpr(Enum):
     VAR, CONST, ADD, SUB, LT, SET, IF1, IF2, WHILE, EMPTY, SEQ, \
-      EXPR, MAIN, MULT, DIV, NOEQUAL, SAME_AS, STDOUT = range(18)
+      EXPR, MAIN, MULT, DIV, NON_EQUAL, EQUAL, STDOUT = range(18)
 
 
 class Node:
@@ -90,7 +90,7 @@ class Parser:
         if self.lexer.translated_token != Lexer.ID:
             return self.test()
         node = self.test()
-        if node.kind == ParserExpr.VAR and self.lexer.translated_token == Lexer.EQUAL:
+        if node.kind == ParserExpr.VAR and self.lexer.translated_token == Lexer.SET:
             self.lexer.next_token()
             node = Node(ParserExpr.SET, operands=[node, self.expr()])
         return node
@@ -98,8 +98,8 @@ class Parser:
     def test(self):
         lexer_compare = {
             Lexer.LESS: ParserExpr.LT,
-            Lexer.NOEQUAL: ParserExpr.NOEQUAL,
-            Lexer.SAME_AS: ParserExpr.SAME_AS
+            Lexer.NON_EQUAL: ParserExpr.NON_EQUAL,
+            Lexer.EQUAL: ParserExpr.EQUAL
         }
         node = self.summa()
         if self.lexer.translated_token in lexer_compare:
@@ -127,7 +127,7 @@ class Parser:
             node = Node(ParserExpr.VAR, self.lexer.value)
             self.lexer.next_token()
             return node
-        elif self.lexer.translated_token == Lexer.NUM:
+        elif self.lexer.translated_token in (Lexer.NUM, Lexer.STRING):
             node = Node(ParserExpr.CONST, self.lexer.value)
             self.lexer.next_token()
             return node

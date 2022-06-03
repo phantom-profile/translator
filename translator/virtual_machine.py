@@ -44,14 +44,15 @@ class VirtualMachine:
                 self.stack.pop()
                 current_address += 1
             elif instruction == Commands.DIV:
-                self.stack[-2] //= self.stack[-1]
+                result = self.stack[-2] / self.stack[-1]
+                self.stack[-2] = int(result) if int(result) == result else result
                 self.stack.pop()
                 current_address += 1
             elif instruction == Commands.LT:
                 self.stack[-2] = 1 if self.stack[-2] < self.stack[-1] else 0
                 self.stack.pop()
                 current_address += 1
-            elif instruction == Commands.NOEQUAL:
+            elif instruction == Commands.NON_EQUAL:
                 self.stack[-2] = 1 if self.stack[-2] != self.stack[-1] else 0
                 self.stack.pop()
                 current_address += 1
@@ -61,10 +62,14 @@ class VirtualMachine:
                 current_address += 1
             elif instruction == Commands.JZ:
                 current_address = arg if self.stack.pop() == 0 else current_address + 2
+            elif instruction == Commands.JNZ:
+                current_address = arg if self.stack.pop() != 0 else current_address + 2
+            elif instruction == Commands.JMP:
+                current_address = arg
             elif instruction == ParserExpr.STDOUT:
                 print(self.stack.pop())
                 current_address += 1
-            elif instruction == Commands.HALT:
+            elif instruction == Commands.FINISH:
                 break
 
         print('Execution finished with exit code 0')
