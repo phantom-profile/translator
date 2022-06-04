@@ -3,6 +3,8 @@ from translator.sys_exceptions import CustomException, custom_raise
 
 
 class Collection:
+    __slots__ = '_elements', 'memory'
+
     def __init__(self, memory: MemoryAllocator):
         self._elements = []
         self.memory: MemoryAllocator = memory

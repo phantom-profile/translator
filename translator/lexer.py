@@ -39,6 +39,16 @@ class Lexer:
         'gets': GETS,
     }
 
+    __slots__ = (
+        'hash_table',
+        'program_file',
+        'logger_file',
+        'current_char',
+        'value',
+        'translated_token',
+        'greedy_perform'
+    )
+
     def __init__(self, program_file: TextIO):
         self.hash_table = hash
         self.program_file = program_file

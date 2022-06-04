@@ -20,6 +20,8 @@ class Pair(NamedTuple):
 class HashTable:
     DELETED = object()
 
+    __slots__ = '_slots', 'memory', '_load_factor_threshold'
+
     def __init__(self, memory: MemoryAllocator, capacity: int = 8, load_factor_threshold: float = 0.6):
         if capacity < 1:
             custom_raise(CustomException("Capacity must be a positive number"))

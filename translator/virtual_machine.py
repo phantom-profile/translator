@@ -5,6 +5,8 @@ from translator.stack_deck_queue import Stack
 
 
 class VirtualMachine:
+    __slots__ = 'logger_file', 'local_variables', 'stack'
+
     def __init__(self, memory_allocator: MemoryAllocator):
         self.logger_file = open('logs/virtual_machine_logs.txt', 'w')
         self.local_variables: HashTable = HashTable(memory_allocator)

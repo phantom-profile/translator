@@ -8,6 +8,8 @@ MY_OPERATIVE_MEMORY = 8 * 1024 * 1024 * 1024
 
 
 class Block:
+    __slots__ = 'size', 'is_used', 'start', 'finish'
+
     def __init__(self, start: int, size: int, is_used: bool):
         self.size: int = size
         self.is_used: bool = is_used
@@ -25,6 +27,8 @@ class Block:
 
 
 class MemoryAllocator:
+    __slots__ = 'logger_file', 'memory_size', 'blocks'
+
     def __init__(self, memory_size: int):
         self.logger_file = open('logs/memory_allocator_logs.txt', 'w')
         self.memory_size: int = memory_size

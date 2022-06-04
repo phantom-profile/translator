@@ -37,6 +37,8 @@ class Compiler:
         ParserExpr.EQUAL: Commands.EQUAL
     }
 
+    __slots__ = 'logger_file', 'program', 'current_address'
+
     def __init__(self):
         self.logger_file = open('logs/compile_logs.txt', 'w')
         self.program = []

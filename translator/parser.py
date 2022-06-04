@@ -14,6 +14,8 @@ class ParserExpr(Enum):
 
 
 class Node:
+    __slots__ = 'kind', 'value', 'operands'
+
     def __init__(self, kind: ParserExpr, value: Optional[int] = None, operands: list[SelfNode] = ()):
         self.kind: ParserExpr = kind
         self.value = value
@@ -27,6 +29,8 @@ class Node:
 
 
 class Parser:
+    __slots__ = 'logger_file', 'lexer'
+
     def __init__(self, lexer: Lexer):
         self.logger_file = open('logs/parser_logs.txt', 'w')
         self.lexer = lexer
