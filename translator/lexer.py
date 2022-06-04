@@ -106,7 +106,7 @@ class Lexer:
             self.translated_token = self.RESERVED_WORDS[ident]
         else:
             self.translated_token = self.ID
-            self.value = hash(ident)
+            self.value = ident
 
     def return_end_of_input(self):
         if self.greedy_perform:

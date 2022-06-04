@@ -6,7 +6,7 @@
 
     puts "circle radius:";
     puts circle_radius;
-    puts "circle square:";
+    puts "circle area:";
     puts circle_square;
     puts "circle perimeter:";
     puts circle_perimeter;
