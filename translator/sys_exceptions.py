@@ -8,7 +8,9 @@ class CustomException:
         self.exit_code = exit_code
 
     def __call__(self, *args, **kwargs):
-        return f'{self.RED_COLOR}invalid operation. {self.message}. finished with code {self.exit_code}'
+        by_hands = self.exit_code == 2
+        is_invalid = '' if by_hands else 'invalid operation.'
+        return f'{self.RED_COLOR}{is_invalid} {self.message}. finished with code {self.exit_code}'
 
 
 def custom_raise(exception: CustomException):

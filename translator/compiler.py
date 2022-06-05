@@ -1,3 +1,4 @@
+from typing import TextIO
 from enum import Enum
 
 from translator.parser import ParserExpr
@@ -21,6 +22,9 @@ class Commands(Enum):
     FINISH = 15      # FINISH    - terminate executing
     INPUT = 16       # INPUT     - get object from standard input
     OUTPUT = 17      # OUTPUT    - print object to standard output
+    ARRAY = 18       # ARRAY     - describe new array and fill it with values
+    INDEX = 19       # INDEX i   - gets element from array by index i
+    RAISE = 20
 
 
 class Compiler:
@@ -39,8 +43,8 @@ class Compiler:
 
     __slots__ = 'logger_file', 'program', 'current_address'
 
-    def __init__(self):
-        self.logger_file = open('logs/compile_logs.txt', 'w')
+    def __init__(self, log_to: TextIO):
+        self.logger_file = log_to
         self.program = []
         self.current_address = 0
 
@@ -62,6 +66,9 @@ class Compiler:
         elif node.kind == ParserExpr.STDOUT:
             self.compile(node.operands[0])
             self.gen(Commands.OUTPUT)
+        elif node.kind == ParserExpr.RAISE:
+            self.compile(node.operands[0])
+            self.gen(Commands.RAISE)
         elif node.kind == ParserExpr.STDIN:
             self.gen(Commands.PUSH)
             self.gen(0)
@@ -109,6 +116,16 @@ class Compiler:
         elif node.kind == ParserExpr.EXPR:
             self.compile(node.operands[0])
             self.gen(Commands.POP)
+        elif node.kind == ParserExpr.ARRAY:
+            for each_node in node.operands:
+                self.compile(each_node)
+            self.gen(Commands.PUSH)
+            self.gen(len(node.operands))
+            self.gen(Commands.ARRAY)
+        elif node.kind == ParserExpr.ARRAY_GET:
+            self.gen(Commands.INDEX)
+            self.compile(node.operands[0])
+            self.compile(node.operands[1])
         elif node.kind == ParserExpr.MAIN:
             self.compile(node.operands[0])
             self.gen(Commands.FINISH)
@@ -118,3 +135,5 @@ class Compiler:
     def log(self):
         for command in self.program:
             self.logger_file.write(str(command) + '\n')
+
+

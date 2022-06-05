@@ -45,12 +45,12 @@ class HashTable:
     def get(self, key) -> Any:
         for _, pair in self._probe(key):
             if pair is None:
-                custom_raise(CustomException(f"No key {key} found"))
+                custom_raise(CustomException(f'No id: "{key}" found'))
             if pair is self.DELETED:
                 continue
             if pair.key == key:
                 return pair.value
-        custom_raise(CustomException(f"No key {key} found"))
+        custom_raise(CustomException(f'No id: "{key}" found'))
 
     def get_or_default(self, key, default=None) -> Optional[Any]:
         for _, pair in self._probe(key):
@@ -65,7 +65,7 @@ class HashTable:
     def del_pair(self, key) -> None:
         for index, pair in self._probe(key):
             if pair is None:
-                custom_raise(CustomException(f"No key {key} found"))
+                custom_raise(CustomException(f'No id: "{key}" found'))
             if pair is self.DELETED:
                 continue
             if pair.key == key:
@@ -73,7 +73,7 @@ class HashTable:
                 self._slots[index] = self.DELETED
                 break
         else:
-            custom_raise(CustomException(f"No key {key} found"))
+            custom_raise(CustomException(f'No id: "{key}" found'))
 
     @property
     def values(self):

@@ -1,4 +1,4 @@
-from typing import List, Any
+from typing import List, Any, TextIO
 from sys import getsizeof
 
 from translator.sys_exceptions import CustomException, custom_raise
@@ -29,8 +29,8 @@ class Block:
 class MemoryAllocator:
     __slots__ = 'logger_file', 'memory_size', 'blocks'
 
-    def __init__(self, memory_size: int):
-        self.logger_file = open('logs/memory_allocator_logs.txt', 'w')
+    def __init__(self, memory_size: int, log_to: TextIO):
+        self.logger_file = log_to
         self.memory_size: int = memory_size
         self.blocks: List[Block] = []
 

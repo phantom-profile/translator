@@ -14,7 +14,7 @@ class Collection:
 
     def _out_of_elements_alert(self) -> None:
         if not self._elements:
-            custom_raise(CustomException(1, 'Collection out of elements'))
+            custom_raise(CustomException('Collection out of elements'))
 
     def __getitem__(self, index):
         return self._elements[index]

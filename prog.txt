@@ -1,13 +1,67 @@
 {
-    PI = 3.14;
-    circle_radius = gets;
-    circle_square = PI * circle_radius * circle_radius;
-    circle_perimeter = 2 * PI * circle_radius;
+    ff = "  ";
+    fs = "  ";
+    ft = "  ";
 
-    puts "circle radius:";
-    puts circle_radius;
-    puts "circle area:";
-    puts circle_square;
-    puts "circle perimeter:";
-    puts circle_perimeter;
+    sf = "  ";
+    ss = "  ";
+    st = "  ";
+
+    tf = "  ";
+    ts = "  ";
+    tt = "  ";
+
+    win = 0;
+    player = " X ";
+    empty = 9;
+    puts "BOARD: ";
+    puts "1 | 2 | 3";
+    puts "----------";
+    puts "4 | 5 | 6";
+    puts "----------";
+    puts "7 | 8 | 9";
+    puts "GO!";
+    puts " ";
+    while (win ^ 0;) {
+        win_row = player + player + player;
+        congrats_message = "player" + player + "won!";
+
+        puts  ff + "|" + fs + "|" + ft;
+        puts "----------";
+        puts  sf + "|" + ss + "|" + st;
+        puts "----------";
+        puts  tf + "|" + ts + "|" + tt;
+        puts "player with symbol " + player;
+        puts "enter number of cell from 1 to 9";
+        num = gets;
+
+        if (num ^ 1;) { ff = player; empty = empty - 1; }
+        if (num ^ 2;) { fs = player; empty = empty - 1; }
+        if (num ^ 3;) { ft = player; empty = empty - 1; }
+        if (num ^ 4;) { sf = player; empty = empty - 1; }
+        if (num ^ 5;) { ss = player; empty = empty - 1; }
+        if (num ^ 6;) { st = player; empty = empty - 1; }
+        if (num ^ 7;) { tf = player; empty = empty - 1; }
+        if (num ^ 8;) { ts = player; empty = empty - 1; }
+        if (num ^ 9;) { tt = player; empty = empty - 1; }
+
+        if (ff + fs + ft ^ win_row;) { puts congrats_message; win = 1; }
+        if (sf + ss + st ^ win_row;) { puts congrats_message; win = 1; }
+        if (tf + ts + tt ^ win_row;) { puts congrats_message; win = 1; }
+        if (ff + sf + tf ^ win_row;) { puts congrats_message; win = 1; }
+        if (fs + ss + ts ^ win_row;) { puts congrats_message; win = 1; }
+        if (ft + st + tt ^ win_row;) { puts congrats_message; win = 1; }
+        if (ff + ss + tt ^ win_row;) { puts congrats_message; win = 1; }
+        if (tf + ss + ft ^ win_row;) { puts congrats_message; win = 1; }
+
+        if (empty + win ^ 0;) { puts "no one won"; win = 1; }
+
+        if (player ^ " X ";) { player = " 0 "; } else { player = " X "; }
+    }
+
+    puts  ff + "|" + fs + "|" + ft;
+    puts "----------";
+    puts  sf + "|" + ss + "|" + st;
+    puts "----------";
+    puts  tf + "|" + ts + "|" + tt;
 }

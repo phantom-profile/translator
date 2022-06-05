@@ -1,7 +1,7 @@
-from typing import TypeVar, Optional
+from typing import TypeVar, Optional, TextIO
 from enum import Enum
 
-from translator.lexer import Lexer
+from translator.lexer import Lexer, Tokens
 from translator.sys_exceptions import CustomException, custom_raise
 
 
@@ -10,7 +10,7 @@ SelfNode = TypeVar("SelfNode", bound="Node")
 
 class ParserExpr(Enum):
     VAR, CONST, ADD, SUB, LT, SET, IF1, IF2, WHILE, EMPTY, SEQ, \
-      EXPR, MAIN, MULT, DIV, NON_EQUAL, EQUAL, STDOUT, STDIN = range(19)
+      EXPR, MAIN, MULT, DIV, NON_EQUAL, EQUAL, STDOUT, STDIN, ARRAY, ARRAY_GET, RAISE = range(22)
 
 
 class Node:
@@ -31,81 +31,93 @@ class Node:
 class Parser:
     __slots__ = 'logger_file', 'lexer'
 
-    def __init__(self, lexer: Lexer):
-        self.logger_file = open('logs/parser_logs.txt', 'w')
+    def __init__(self, lexer: Lexer, log_to: TextIO):
+        self.logger_file = log_to
         self.lexer = lexer
 
     def parse(self) -> Node:
         self.lexer.next_token()
         node = Node(ParserExpr.MAIN, operands=[self._statement()])
-        if self.lexer.translated_token != Lexer.EOF:
-            custom_raise(CustomException("Invalid statement syntax"))
+        if self.lexer.translated_token != Tokens.EOF:
+            custom_raise(CustomException(f"Invalid statement syntax at line {self.lexer.current_line_count}"))
         self._log(node)
         return node
 
     # PRIVATE
 
     def _statement(self) -> Node:
-        if self.lexer.translated_token == Lexer.IF:
+        if self.lexer.translated_token == Tokens.IF:
             node = Node(ParserExpr.IF1)
             self.lexer.next_token()
             node.operands = [
                 self._paren_expr(),
                 self._statement()
             ]
-            if self.lexer.translated_token == Lexer.ELSE:
+            if self.lexer.translated_token == Tokens.ELSE:
                 node.kind = ParserExpr.IF2
                 self.lexer.next_token()
                 node.operands.append(self._statement())
-        elif self.lexer.translated_token == Lexer.WHILE:
+        elif self.lexer.translated_token == Tokens.WHILE:
             node = Node(ParserExpr.WHILE)
             self.lexer.next_token()
             node.operands = [self._paren_expr(), self._statement()]
-        elif self.lexer.translated_token == Lexer.PUTS:
+        elif self.lexer.translated_token == Tokens.PUTS:
             node = Node(ParserExpr.STDOUT)
             self.lexer.next_token()
             node.operands = [self._statement()]
-        elif self.lexer.translated_token == Lexer.SEMICOLON:
+        elif self.lexer.translated_token == Tokens.RAISE:
+            node = Node(ParserExpr.RAISE)
+            self.lexer.next_token()
+            node.operands = [self._term()]
+        elif self.lexer.translated_token == Tokens.SEMICOLON:
             node = Node(ParserExpr.EMPTY)
             self.lexer.next_token()
-        elif self.lexer.translated_token == Lexer.LBRA:
+        elif self.lexer.translated_token == Tokens.LBRA:
             node = Node(ParserExpr.EMPTY)
             self.lexer.next_token()
-            while self.lexer.translated_token != Lexer.RBRA:
+            while self.lexer.translated_token != Tokens.RBRA:
                 node.kind = ParserExpr.SEQ
                 node.operands.append(self._statement())
             self.lexer.next_token()
+        elif self.lexer.translated_token == Tokens.LARRBR:
+            print(self.lexer.translated_token)
+            node = Node(ParserExpr.ARRAY)
+            self.lexer.next_token()
+            print(self.lexer.translated_token)
+            while self.lexer.translated_token != Tokens.RARRBR:
+                print(self.lexer.translated_token)
+                node.operands.append(self._expr())
         else:
-            node = Node(ParserExpr.EXPR, operands=[self.expr()])
-            if self.lexer.translated_token != Lexer.SEMICOLON:
-                custom_raise(CustomException('";" expected'))
+            node = Node(ParserExpr.EXPR, operands=[self._expr()])
+            if self.lexer.translated_token != Tokens.SEMICOLON:
+                custom_raise(CustomException(f'";" expected at line {self.lexer.current_line_count}'))
             self.lexer.next_token()
         return node
 
     def _paren_expr(self) -> Node:
-        if self.lexer.translated_token != Lexer.LPAR:
-            custom_raise(CustomException('"(" expected'))
+        if self.lexer.translated_token != Tokens.LPAR:
+            custom_raise(CustomException(f'"(" expected at line {self.lexer.current_line_count}'))
         self.lexer.next_token()
         node = self._statement()
-        if self.lexer.translated_token != Lexer.RPAR:
-            custom_raise(CustomException('"(" expected'))
+        if self.lexer.translated_token != Tokens.RPAR:
+            custom_raise(CustomException(f'")" expected at line {self.lexer.current_line_count}'))
         self.lexer.next_token()
         return node
 
-    def expr(self) -> Node:
-        if self.lexer.translated_token != Lexer.ID:
+    def _expr(self) -> Node:
+        if self.lexer.translated_token != Tokens.ID:
             return self._test()
         node = self._test()
-        if node.kind == ParserExpr.VAR and self.lexer.translated_token == Lexer.SET:
+        if node.kind == ParserExpr.VAR and self.lexer.translated_token == Tokens.SET:
             self.lexer.next_token()
-            node = Node(ParserExpr.SET, operands=[node, self.expr()])
+            node = Node(ParserExpr.SET, operands=[node, self._expr()])
         return node
 
     def _test(self) -> Node:
         lexer_compare = {
-            Lexer.LESS: ParserExpr.LT,
-            Lexer.NON_EQUAL: ParserExpr.NON_EQUAL,
-            Lexer.EQUAL: ParserExpr.EQUAL
+            Tokens.LESS: ParserExpr.LT,
+            Tokens.NON_EQUAL: ParserExpr.NON_EQUAL,
+            Tokens.EQUAL: ParserExpr.EQUAL
         }
         node = self._summa()
         if self.lexer.translated_token in lexer_compare:
@@ -116,10 +128,10 @@ class Parser:
 
     def _summa(self) -> Node:
         lexer_math = {
-            Lexer.PLUS: ParserExpr.ADD,
-            Lexer.MINUS: ParserExpr.SUB,
-            Lexer.MULT: ParserExpr.MULT,
-            Lexer.DIV: ParserExpr.DIV,
+            Tokens.PLUS: ParserExpr.ADD,
+            Tokens.MINUS: ParserExpr.SUB,
+            Tokens.MULT: ParserExpr.MULT,
+            Tokens.DIV: ParserExpr.DIV,
         }
         node = self._term()
         while self.lexer.translated_token in lexer_math:
@@ -129,16 +141,26 @@ class Parser:
         return node
 
     def _term(self) -> Node:
-        if self.lexer.translated_token == Lexer.ID:
+        if self.lexer.translated_token == Tokens.ID:
             node = Node(ParserExpr.VAR, self.lexer.value)
             self.lexer.next_token()
+            if self.lexer.translated_token == Tokens.DOT:
+                self.lexer.next_token()
+                node = Node(ParserExpr.ARRAY_GET, operands=[node, self._term()])
             return node
-        elif self.lexer.translated_token == Lexer.GETS:
+        elif self.lexer.translated_token == Tokens.GETS:
             node = Node(ParserExpr.STDIN, self.lexer.value)
             self.lexer.next_token()
             return node
-        elif self.lexer.translated_token in (Lexer.NUM, Lexer.STRING):
+        elif self.lexer.translated_token in (Tokens.NUM, Tokens.STRING):
             node = Node(ParserExpr.CONST, self.lexer.value)
+            self.lexer.next_token()
+            return node
+        elif self.lexer.translated_token == Tokens.LARRBR:
+            node = Node(ParserExpr.ARRAY)
+            self.lexer.next_token()
+            while self.lexer.translated_token != Tokens.RARRBR:
+                node.operands.append(self._expr())
             self.lexer.next_token()
             return node
         else:
@@ -146,3 +168,8 @@ class Parser:
 
     def _log(self, node) -> None:
         self.logger_file.write(node.draw_tree())
+
+
+if __name__ == '__main__':
+    p = Parser(Lexer(open('../prog.txt', 'r')))
+    print(p.parse().draw_tree())
