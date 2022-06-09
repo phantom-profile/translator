@@ -2,6 +2,7 @@ from typing import TextIO
 from enum import Enum
 
 from translator.parser import ParserExpr
+from translator.sys_exceptions import custom_raise, CustomException
 
 
 class Commands(Enum):
@@ -15,7 +16,7 @@ class Commands(Enum):
     SUB = 8          # SUB       - substitute two numbers on top of stack
     LT = 9           # LT        - compare two numbers on top of stack (a < b). Result - 0 или 1
     NON_EQUAL = 10   # NON_EQUAL - compare two numbers on top of stack (a != b). Result - 0 или 1
-    EQUAL = 11       # EQUAL   - compare two numbers on top of stack (a == b). Result - 0 или 1
+    EQUAL = 11       # EQUAL     - compare two numbers on top of stack (a == b). Result - 0 или 1
     JZ = 12          # JZ    A   - if 0 on top of stack - jump to A address.
     JNZ = 13         # JNZ   A   - if NOT 0 on top of stack - jump to A address.
     JMP = 14         # JMP   A   - jump to A address
@@ -24,7 +25,7 @@ class Commands(Enum):
     OUTPUT = 17      # OUTPUT    - print object to standard output
     ARRAY = 18       # ARRAY     - describe new array and fill it with values
     INDEX = 19       # INDEX i   - gets element from array by index i
-    RAISE = 20
+    RAISE = 20       # RAISE     - raises runtime error with text got as argument
 
 
 class Compiler:
@@ -41,12 +42,14 @@ class Compiler:
         ParserExpr.EQUAL: Commands.EQUAL
     }
 
-    __slots__ = 'logger_file', 'program', 'current_address'
+    __slots__ = 'logger_file', 'program', 'current_address', 'marks', 'jumps'
 
     def __init__(self, log_to: TextIO):
         self.logger_file = log_to
         self.program = []
         self.current_address = 0
+        self.marks = {}
+        self.jumps = {}
 
     def gen(self, command) -> None:
         self.program.append(command)
@@ -116,16 +119,23 @@ class Compiler:
         elif node.kind == ParserExpr.EXPR:
             self.compile(node.operands[0])
             self.gen(Commands.POP)
-        elif node.kind == ParserExpr.ARRAY:
-            for each_node in node.operands:
-                self.compile(each_node)
-            self.gen(Commands.PUSH)
-            self.gen(len(node.operands))
-            self.gen(Commands.ARRAY)
-        elif node.kind == ParserExpr.ARRAY_GET:
-            self.gen(Commands.INDEX)
-            self.compile(node.operands[0])
-            self.compile(node.operands[1])
+        elif node.kind == ParserExpr.GOTO:
+            mark = node.operands[0].operands[0]
+            mark_id = mark.value
+            self.gen(Commands.JMP)
+            if self.marks.get(mark_id):
+                self.gen(self.marks[mark_id])
+            else:
+                self.jumps[mark_id] = self.current_address
+                self.gen(-1)
+        elif node.kind == ParserExpr.MARK:
+            mark = self.marks.get(node.value)
+            if mark:
+                custom_raise(CustomException(f'Mark {node.value} was declared more than once'))
+            self.marks[node.value] = self.current_address
+            planed_jump = self.jumps.get(node.value)
+            if planed_jump:
+                self.program[planed_jump] = self.current_address
         elif node.kind == ParserExpr.MAIN:
             self.compile(node.operands[0])
             self.gen(Commands.FINISH)

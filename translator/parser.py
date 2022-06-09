@@ -10,7 +10,7 @@ SelfNode = TypeVar("SelfNode", bound="Node")
 
 class ParserExpr(Enum):
     VAR, CONST, ADD, SUB, LT, SET, IF1, IF2, WHILE, EMPTY, SEQ, \
-      EXPR, MAIN, MULT, DIV, NON_EQUAL, EQUAL, STDOUT, STDIN, ARRAY, ARRAY_GET, RAISE = range(22)
+      EXPR, MAIN, MULT, DIV, NON_EQUAL, EQUAL, STDOUT, STDIN, RAISE, GOTO, MARK = range(22)
 
 
 class Node:
@@ -20,6 +20,9 @@ class Node:
         self.kind: ParserExpr = kind
         self.value = value
         self.operands: list[SelfNode] = list(operands)
+
+    def __str__(self):
+        self.draw_tree()
 
     def draw_tree(self, depth=1) -> str:
         nodes = '\t' * depth + 'NODES:\n' if self.operands else ''
@@ -61,6 +64,10 @@ class Parser:
             node = Node(ParserExpr.WHILE)
             self.lexer.next_token()
             node.operands = [self._paren_expr(), self._statement()]
+        elif self.lexer.translated_token == Tokens.GOTO:
+            node = Node(ParserExpr.GOTO)
+            self.lexer.next_token()
+            node.operands = [self._statement()]
         elif self.lexer.translated_token == Tokens.PUTS:
             node = Node(ParserExpr.STDOUT)
             self.lexer.next_token()
@@ -79,14 +86,6 @@ class Parser:
                 node.kind = ParserExpr.SEQ
                 node.operands.append(self._statement())
             self.lexer.next_token()
-        elif self.lexer.translated_token == Tokens.LARRBR:
-            print(self.lexer.translated_token)
-            node = Node(ParserExpr.ARRAY)
-            self.lexer.next_token()
-            print(self.lexer.translated_token)
-            while self.lexer.translated_token != Tokens.RARRBR:
-                print(self.lexer.translated_token)
-                node.operands.append(self._expr())
         else:
             node = Node(ParserExpr.EXPR, operands=[self._expr()])
             if self.lexer.translated_token != Tokens.SEMICOLON:
@@ -141,27 +140,20 @@ class Parser:
         return node
 
     def _term(self) -> Node:
+        node = None
         if self.lexer.translated_token == Tokens.ID:
             node = Node(ParserExpr.VAR, self.lexer.value)
             self.lexer.next_token()
-            if self.lexer.translated_token == Tokens.DOT:
-                self.lexer.next_token()
-                node = Node(ParserExpr.ARRAY_GET, operands=[node, self._term()])
-            return node
         elif self.lexer.translated_token == Tokens.GETS:
             node = Node(ParserExpr.STDIN, self.lexer.value)
             self.lexer.next_token()
-            return node
         elif self.lexer.translated_token in (Tokens.NUM, Tokens.STRING):
             node = Node(ParserExpr.CONST, self.lexer.value)
             self.lexer.next_token()
-            return node
-        elif self.lexer.translated_token == Tokens.LARRBR:
-            node = Node(ParserExpr.ARRAY)
+        elif self.lexer.translated_token == Tokens.MARK:
+            node = Node(ParserExpr.MARK, self.lexer.value)
             self.lexer.next_token()
-            while self.lexer.translated_token != Tokens.RARRBR:
-                node.operands.append(self._expr())
-            self.lexer.next_token()
+        if node is not None:
             return node
         else:
             return self._paren_expr()

@@ -7,7 +7,7 @@ from translator.sys_exceptions import CustomException, custom_raise
 
 class Tokens(Enum):
     NUM, ID, IF, ELSE, WHILE, LBRA, RBRA, LPAR, RPAR, PLUS, MINUS, MULT, DIV, LESS, \
-      SET, NON_EQUAL, SEMICOLON, PUTS, EQUAL, QUOTE, STRING, GETS, EOF, LARRBR, RARRBR, DOT, RAISE = range(27)
+      SET, NON_EQUAL, SEMICOLON, PUTS, EQUAL, QUOTE, STRING, GETS, EOF, RAISE, GOTO, MARK = range(26)
 
 
 class Lexer:
@@ -26,9 +26,6 @@ class Lexer:
         '~': Tokens.NON_EQUAL,
         '^': Tokens.EQUAL,
         '"': Tokens.QUOTE,
-        '[': Tokens.LARRBR,
-        ']': Tokens.RARRBR,
-        '.': Tokens.DOT,
     }
 
     RESERVED_WORDS = {
@@ -38,6 +35,7 @@ class Lexer:
         'puts': Tokens.PUTS,
         'gets': Tokens.GETS,
         'raise': Tokens.RAISE,
+        'goto': Tokens.GOTO
     }
 
     __slots__ = (
@@ -84,6 +82,8 @@ class Lexer:
                 self.tokenize_number()
             elif self.current_char.isalpha():
                 self.tokenize_ids_and_reserved_words()
+            elif self.current_char == '@':
+                self.tokenize_mark()
             elif self.translated_token != Tokens.EOF:
                 custom_raise(
                     CustomException(
@@ -97,6 +97,15 @@ class Lexer:
         if self.current_char == '"':
             return self.tokenize_string()
         self.translated_token = self.LANGUAGE_SYMBOLS[self.current_char]
+
+    def tokenize_mark(self):
+        mark = ''
+        while self.current_char in ascii_letters + '_@':
+            mark += self.current_char.lower()
+            self.get_char()
+            self.greedy_perform = True
+        self.translated_token = Tokens.MARK
+        self.value = mark
 
     def tokenize_string(self):
         string_const = ''

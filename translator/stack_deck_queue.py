@@ -16,12 +16,6 @@ class Collection:
         if not self._elements:
             custom_raise(CustomException('Collection out of elements'))
 
-    def __getitem__(self, index):
-        return self._elements[index]
-
-    def __setitem__(self, key: int, value):
-        self._elements[key] = value
-
     def __len__(self) -> int:
         return len(self._elements)
 

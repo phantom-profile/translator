@@ -45,50 +45,56 @@ class VirtualMachine:
                 self.stack.pop()
                 current_address += 1
             elif instruction == Commands.ADD:
-                self.stack[-2] += self.stack[-1]
-                self.stack.pop()
+                value = self.stack.pop()
+                value_2 = self.stack.pop()
                 current_address += 1
+                self.stack.push(value_2 + value)
             elif instruction == Commands.SUB:
-                self.stack[-2] -= self.stack[-1]
-                self.stack.pop()
+                value = self.stack.pop()
+                value_2 = self.stack.pop()
+                self.stack.push(value_2 - value)
                 current_address += 1
             elif instruction == Commands.MULT:
-                self.stack[-2] *= self.stack[-1]
-                self.stack.pop()
+                value = self.stack.pop() * self.stack.pop()
+                self.stack.push(value)
                 current_address += 1
             elif instruction == Commands.DIV:
-                if self.stack[-1] == 0:
+                value = self.stack.pop()
+                value_2 = self.stack.pop()
+                if value == 0:
                     custom_raise(CustomException('division by zero detected'))
                     break
-                result = self.stack[-2] / self.stack[-1]
-                self.stack[-2] = int(result) if int(result) == result else result
-                self.stack.pop()
+                result = value_2 / value
+                result = int(result) if int(result) == result else result
+                self.stack.push(result)
                 current_address += 1
             elif instruction == Commands.LT:
-                self.stack[-2] = 1 if self.stack[-2] < self.stack[-1] else 0
-                self.stack.pop()
+                second = self.stack.pop()
+                first = self.stack.pop()
+                result = 1 if first < second else 0
+                self.stack.push(result)
                 current_address += 1
             elif instruction == Commands.NON_EQUAL:
-                self.stack[-2] = 1 if self.stack[-2] != self.stack[-1] else 0
-                self.stack.pop()
+                second = self.stack.pop()
+                first = self.stack.pop()
+                result = 1 if first != second else 0
+                self.stack.push(result)
                 current_address += 1
             elif instruction == Commands.EQUAL:
-                self.stack[-2] = 1 if self.stack[-2] == self.stack[-1] else 0
-                self.stack.pop()
+                second = self.stack.pop()
+                first = self.stack.pop()
+                result = 1 if first == second else 0
+                self.stack.push(result)
                 current_address += 1
             elif instruction == Commands.JZ:
                 current_address = arg if self.stack.pop() == 0 else current_address + 2
             elif instruction == Commands.JNZ:
                 current_address = arg if self.stack.pop() != 0 else current_address + 2
             elif instruction == Commands.JMP:
+                if arg == -1:
+                    custom_raise(CustomException('Failed jump. Check if marks correct'))
+                    break
                 current_address = arg
-            elif instruction == Commands.ARRAY:
-                new_array = []
-                length = self.stack.pop()
-                for element in range(length):
-                    new_array.append(self.stack.pop())
-                self.stack.push(list(reversed(new_array)))
-                current_address += 1
             elif instruction == Commands.RAISE:
                 custom_raise(
                     CustomException(
@@ -105,7 +111,8 @@ class VirtualMachine:
                         value = float(value)
                     except ValueError:
                         value = str(value)
-                self.stack[-1] = value
+                self.stack.pop()
+                self.stack.push(value)
                 current_address += 1
             elif instruction == Commands.OUTPUT:
                 print(self.stack.pop())
