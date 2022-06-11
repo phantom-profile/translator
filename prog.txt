@@ -1,4 +1,13 @@
 {
+    a = 3 / 0;
+    raise "Custom Error";
+    goto @SKIP;
+    puts "i am skipped";
+    @SKIP;
+
+    @LOOP;
+    puts "I am looped";
+    goto @LOOP;
     ff = "  ";
     fs = "  ";
     ft = "  ";
